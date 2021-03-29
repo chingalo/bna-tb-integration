@@ -1,0 +1,41 @@
+{
+  "name": "bna-tb-integration",
+  "version": "1.0.0",
+  "description": "script for support bna & Tb integration",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write \"*.js\"  \"*/*.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/chingalo/bna-tb-integration.git"
+  },
+  "keywords": [
+    "bna",
+    "tb",
+    "integration"
+  ],
+  "author": "Joseph Chingalo",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/chingalo/bna-tb-integration/issues"
+  },
+  "homepage": "https://github.com/chingalo/bna-tb-integration#readme",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "dependencies": {
+    "commitizen": "^4.2.3",
+    "cz-conventional-changelog": "^3.3.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.1",
+    "prettier": "^2.2.1",
+    "promise": "^8.1.0",
+    "request": "^2.88.2",
+    "shelljs": "^0.8.4",
+    "xlsx": "^0.16.9"
+  }
+}
