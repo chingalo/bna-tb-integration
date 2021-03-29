@@ -1,0 +1,8 @@
+*.txt
+*.xls*
+*.csv
+node_modules
+configs/server-config.js
+configs/meta-data-config.js
+.DS_Store
+files-folder
