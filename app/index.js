@@ -1,7 +1,16 @@
-const { sourceConfig, destinationConfig } = require('../configs');
+const {
+  sourceConfig,
+  destinationConfig,
+  metadataConfig,
+  analyticalPeriod,
+} = require('../configs');
 
 const logsHelper = require('../helpers/logs.helper');
 const dhis2UtilHelper = require('../helpers/dhis2-util.helper');
+
+const dataExtractor = require('./data-extractor');
+const dataProcessor = require('./data-extractor');
+const dataUploader = require('./data-uploader');
 
 async function startApp() {
   try {
@@ -22,6 +31,8 @@ async function startApp() {
       sourceUrl,
       destinationHeaders,
       destinationUrl,
+      metadataConfig,
+      analyticalPeriod,
     });
   } catch (error) {
     await logsHelper.addLogs('error', error.message || error, 'startApp');
