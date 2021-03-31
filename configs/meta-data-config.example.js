@@ -7,5 +7,6 @@ const metadataConfig = [
 
 module.exports = {
   metadataConfig,
-  analyticalPeriod: 'LAST_12_MONTHS',
+  analyticalPeriods: ['LAST_12_MONTHS'],
+  analyticalOuLevels: ['LEVEL-2'],
 };

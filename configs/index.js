@@ -1,9 +1,14 @@
 const { sourceServer, destinationServer } = require('./server-config');
-const { metadataConfig, analyticalPeriod } = require('./meta-data-config');
+const {
+  metadataConfig,
+  analyticalPeriods,
+  analyticalOuLevels,
+} = require('./meta-data-config');
 
 module.exports = {
   sourceConfig: sourceServer,
   destinationConfig: destinationServer,
   metadataConfig,
-  analyticalPeriod,
+  analyticalOuLevels,
+  analyticalPeriods,
 };
