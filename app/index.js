@@ -33,6 +33,7 @@ async function startApp() {
       analyticalOuLevels,
       metadataConfig
     );
+    console.log(sourceResponseData);
   } catch (error) {
     await logsHelper.addLogs('error', error.message || error, 'startApp');
   }
