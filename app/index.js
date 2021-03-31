@@ -2,7 +2,8 @@ const {
   sourceConfig,
   destinationConfig,
   metadataConfig,
-  analyticalPeriod,
+  analyticalPeriods,
+  analyticalOuLevels,
 } = require('../configs');
 
 const logsHelper = require('../helpers/logs.helper');
@@ -25,15 +26,13 @@ async function startApp() {
       destinationConfig.username,
       destinationConfig.password
     );
-
-    console.log({
+    const sourceResponseData = await dataExtractor.getAnlyticalDataFromServer(
       sourceHeaders,
       sourceUrl,
-      destinationHeaders,
-      destinationUrl,
-      metadataConfig,
-      analyticalPeriod,
-    });
+      analyticalPeriods,
+      analyticalOuLevels,
+      metadataConfig
+    );
   } catch (error) {
     await logsHelper.addLogs('error', error.message || error, 'startApp');
   }
