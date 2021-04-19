@@ -1,7 +1,7 @@
 const {
   sourceConfig,
   destinationConfig,
-  metadataConfig,
+  metadataConfigs,
   analyticalPeriods,
   analyticalOuLevels,
   ouColumFromFile,
@@ -13,7 +13,7 @@ const logsHelper = require('../helpers/logs.helper');
 const dhis2UtilHelper = require('../helpers/dhis2-util.helper');
 
 const dataExtractor = require('./data-extractor');
-const dataProcessor = require('./data-extractor');
+const dataProcessor = require('./data-processor');
 const dataUploader = require('./data-uploader');
 
 async function startApp(isSourceFile, manualPeriod) {
@@ -49,7 +49,10 @@ async function startApp(isSourceFile, manualPeriod) {
           analyticalOuLevels,
           metadataConfig
         );
-    console.log(sourceResponseData);
+    const processedAnalyticalData = await dataProcessor.getProcessedAnalyticalData(
+      sourceResponseData,
+      metadataConfigs
+    );
   } catch (error) {
     await logsHelper.addLogs('error', error.message || error, 'startApp');
   }

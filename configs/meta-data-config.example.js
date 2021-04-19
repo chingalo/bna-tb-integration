@@ -1,4 +1,4 @@
-const metadataConfig = [
+const metadataConfigs = [
   {
     sourceId: 'source_id',
     destinationId: 'destination_id',
@@ -6,7 +6,7 @@ const metadataConfig = [
 ];
 
 module.exports = {
-  metadataConfig,
+  metadataConfigs,
   analyticalPeriods: ['LAST_12_MONTHS'],
   analyticalOuLevels: ['LEVEL-2'],
   dxColumnFromFile: 'name_of_column_excel_for_data_id',
