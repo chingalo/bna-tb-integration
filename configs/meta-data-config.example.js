@@ -7,6 +7,8 @@ const metadataConfigs = [
 
 module.exports = {
   metadataConfigs,
+  isSourceFile: true,
+  manualPeriod: 'iso_period_for_file_data',
   analyticalPeriods: ['LAST_12_MONTHS'],
   analyticalOuLevels: ['LEVEL-2'],
   dxColumnFromFile: 'name_of_column_excel_for_data_id',
