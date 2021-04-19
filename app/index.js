@@ -4,6 +4,8 @@ const {
   metadataConfig,
   analyticalPeriods,
   analyticalOuLevels,
+  ouColumFromFile,
+  dataColumFromFile,
 } = require('../configs');
 
 const logsHelper = require('../helpers/logs.helper');
@@ -13,7 +15,7 @@ const dataExtractor = require('./data-extractor');
 const dataProcessor = require('./data-extractor');
 const dataUploader = require('./data-uploader');
 
-async function startApp(isSourceFile = true) {
+async function startApp(isSourceFile, manualPeriod) {
   try {
     await logsHelper.addLogs('info', `Start the process`, 'startApp');
     const sourceUrl = sourceConfig.url;
@@ -27,7 +29,11 @@ async function startApp(isSourceFile = true) {
       destinationConfig.password
     );
     const sourceResponseData = isSourceFile
-      ? await dataExtractor.getAnlyticalDataFromFile()
+      ? await dataExtractor.getAnlyticalDataFromFile(
+          manualPeriod,
+          ouColumFromFile,
+          dataColumFromFile
+        )
       : await dataExtractor.getAnlyticalDataFromServer(
           sourceHeaders,
           sourceUrl,

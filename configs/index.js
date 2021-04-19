@@ -3,6 +3,8 @@ const {
   metadataConfig,
   analyticalPeriods,
   analyticalOuLevels,
+  dataColumFromFile,
+  ouColumFromFile,
 } = require('./meta-data-config');
 
 module.exports = {
@@ -11,4 +13,6 @@ module.exports = {
   metadataConfig,
   analyticalOuLevels,
   analyticalPeriods,
+  dataColumFromFile,
+  ouColumFromFile,
 };
