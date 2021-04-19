@@ -15,12 +15,6 @@ async function getAnlyticalDataFromFile(
   const fileDir = 'inputs';
 
   try {
-    console.log({
-      period,
-      ouColumFromFile,
-      dxColumnFromFile,
-      valueColumnFromFile,
-    });
     await logsHelper.addLogs(
       'info',
       'Discovering analytical data from the files',
