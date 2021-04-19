@@ -1,14 +1,20 @@
 const { sourceServer, destinationServer } = require('./server-config');
 const {
-  metadataConfig,
+  metadataConfigs,
   analyticalPeriods,
   analyticalOuLevels,
+  ouColumFromFile,
+  dxColumnFromFile,
+  valueColumnFromFile,
 } = require('./meta-data-config');
 
 module.exports = {
   sourceConfig: sourceServer,
   destinationConfig: destinationServer,
-  metadataConfig,
+  metadataConfigs,
   analyticalOuLevels,
   analyticalPeriods,
+  ouColumFromFile,
+  dxColumnFromFile,
+  valueColumnFromFile,
 };
