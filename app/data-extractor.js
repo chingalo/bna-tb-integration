@@ -2,6 +2,70 @@ const _ = require('lodash');
 
 const logsHelper = require('../helpers/logs.helper');
 const httpHelper = require('../helpers/http.helper');
+const fileManipulationHelper = require('../helpers/file-manipulation.helper');
+const exceleFileUtilHelper = require('../helpers/excel-file-util.helper');
+
+async function getAnlyticalDataFromFile(
+  period,
+  ouColumFromFile,
+  dxColumnFromFile,
+  valueColumnFromFile
+) {
+  const analyticalData = [];
+  const fileDir = 'inputs';
+
+  try {
+    console.log({
+      period,
+      ouColumFromFile,
+      dxColumnFromFile,
+      valueColumnFromFile,
+    });
+    await logsHelper.addLogs(
+      'info',
+      'Discovering analytical data from the files',
+      'getAnlyticalDataFromFile'
+    );
+    const filesNames = fileManipulationHelper.getFileNamesFromDirectories(
+      fileDir
+    );
+    for (const filesName of filesNames) {
+      const filePath = `${fileManipulationHelper.fileDir}/${fileDir}/${filesName}`;
+      const excelJsonData = await exceleFileUtilHelper.getJsonDataFromExcelOrCsvFile(
+        filePath
+      );
+      for (const sheetName of _.keys(excelJsonData)) {
+        const sheetData = _.filter(
+          excelJsonData[sheetName],
+          (data) =>
+            _.keys(data).includes(ouColumFromFile) &&
+            _.keys(data).includes(dxColumnFromFile) &&
+            _.keys(data).includes(valueColumnFromFile)
+        );
+        analyticalData.push(
+          _.map(sheetData, (data) => {
+            return {
+              dx: data[dxColumnFromFile],
+              ou: data[ouColumFromFile],
+              value: data[valueColumnFromFile],
+            };
+          })
+        );
+      }
+    }
+  } catch (error) {
+    await logsHelper.addLogs(
+      'error',
+      error.message || error,
+      'getAnlyticalDataFromFile'
+    );
+  }
+  return _.flattenDeep(
+    _.map(_.flatMapDeep(analyticalData), (data) => {
+      return { ...data, pe: `${period}` };
+    })
+  );
+}
 
 async function getAnlyticalDataFromServer(
   headers,
@@ -24,9 +88,12 @@ async function getAnlyticalDataFromServer(
       metadataConfig
     );
     const analyticalResponse = await httpHelper.getHttp(headers, url);
-    if (_.has(analyticalResponse, 'headers') && _.has(analyticalResponse,'rows')) {
-        const formattedResponse = getFormattedDataFromServer(analyticalResponse);
-        sourceResponseData.push(formattedResponse);
+    if (
+      _.has(analyticalResponse, 'headers') &&
+      _.has(analyticalResponse, 'rows')
+    ) {
+      const formattedResponse = getFormattedDataFromServer(analyticalResponse);
+      sourceResponseData.push(formattedResponse);
     } else {
       await logsHelper.addLogs(
         'error',
@@ -44,20 +111,34 @@ async function getAnlyticalDataFromServer(
   return _.flattenDeep(sourceResponseData);
 }
 
-function getFormattedDataFromServer(analyticalResponse){
-    const {headers, rows} = analyticalResponse;
-    const dxIndex =  _.findIndex(headers || [], header=> header && header.name === "dx");
-    const ouIndex =  _.findIndex(headers || [], header=> header && header.name === "ou");
-    const peIndex =  _.findIndex(headers || [], header=> header && header.name === "pe");
-    const valueIndex =  _.findIndex(headers || [], header=> header && header.name === "value");
-    return  _.flattenDeep(_.map(rows, row=>{
-        return {
-            dx : row[dxIndex] || "",
-            pe : row[peIndex] || "",
-            ou : row[ouIndex] || "",
-            value : row[valueIndex] || "",
-        }
-    }));
+function getFormattedDataFromServer(analyticalResponse) {
+  const { headers, rows } = analyticalResponse;
+  const dxIndex = _.findIndex(
+    headers || [],
+    (header) => header && header.name === 'dx'
+  );
+  const ouIndex = _.findIndex(
+    headers || [],
+    (header) => header && header.name === 'ou'
+  );
+  const peIndex = _.findIndex(
+    headers || [],
+    (header) => header && header.name === 'pe'
+  );
+  const valueIndex = _.findIndex(
+    headers || [],
+    (header) => header && header.name === 'value'
+  );
+  return _.flattenDeep(
+    _.map(rows, (row) => {
+      return {
+        dx: row[dxIndex] || '',
+        pe: row[peIndex] || '',
+        ou: row[ouIndex] || '',
+        value: row[valueIndex] || '',
+      };
+    })
+  );
 }
 
 function getAnlyticalUrl(
@@ -77,4 +158,5 @@ function getAnlyticalUrl(
 
 module.exports = {
   getAnlyticalDataFromServer,
+  getAnlyticalDataFromFile,
 };
