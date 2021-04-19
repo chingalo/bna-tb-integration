@@ -5,7 +5,8 @@ const {
   analyticalPeriods,
   analyticalOuLevels,
   ouColumFromFile,
-  dataColumFromFile,
+  dxColumnFromFile,
+  valueColumnFromFile,
 } = require('../configs');
 
 const logsHelper = require('../helpers/logs.helper');
@@ -28,11 +29,18 @@ async function startApp(isSourceFile, manualPeriod) {
       destinationConfig.username,
       destinationConfig.password
     );
+    console.log({
+      manualPeriod,
+      ouColumFromFile,
+      dxColumnFromFile,
+      valueColumnFromFile,
+    });
     const sourceResponseData = isSourceFile
       ? await dataExtractor.getAnlyticalDataFromFile(
           manualPeriod,
           ouColumFromFile,
-          dataColumFromFile
+          dxColumnFromFile,
+          valueColumnFromFile
         )
       : await dataExtractor.getAnlyticalDataFromServer(
           sourceHeaders,

@@ -3,17 +3,56 @@ const _ = require('lodash');
 const logsHelper = require('../helpers/logs.helper');
 const httpHelper = require('../helpers/http.helper');
 const fileManipulationHelper = require('../helpers/file-manipulation.helper');
+const exceleFileUtilHelper = require('../helpers/excel-file-util.helper');
 
-async function getAnlyticalDataFromFile() {
-  console.log('get data');
+async function getAnlyticalDataFromFile(
+  period,
+  ouColumFromFile,
+  dxColumnFromFile,
+  valueColumnFromFile
+) {
   const analyticalData = [];
   const fileDir = 'inputs';
 
   try {
+    console.log({
+      period,
+      ouColumFromFile,
+      dxColumnFromFile,
+      valueColumnFromFile,
+    });
+    await logsHelper.addLogs(
+      'info',
+      'Discovering analytical data from the files',
+      'getAnlyticalDataFromFile'
+    );
     const filesNames = fileManipulationHelper.getFileNamesFromDirectories(
       fileDir
     );
-    console.log({ filesNames });
+    for (const filesName of filesNames) {
+      const filePath = `${fileManipulationHelper.fileDir}/${fileDir}/${filesName}`;
+      const excelJsonData = await exceleFileUtilHelper.getJsonDataFromExcelOrCsvFile(
+        filePath
+      );
+      for (const sheetName of _.keys(excelJsonData)) {
+        const sheetData = _.filter(
+          excelJsonData[sheetName],
+          (data) =>
+            _.keys(data).includes(ouColumFromFile) &&
+            _.keys(data).includes(dxColumnFromFile) &&
+            _.keys(data).includes(valueColumnFromFile)
+        );
+        analyticalData.push(
+          _.map(sheetData, (data) => {
+            return {
+              dx: data[dxColumnFromFile],
+              ou: data[ouColumFromFile],
+              value: data[valueColumnFromFile],
+            };
+          })
+        );
+      }
+    }
   } catch (error) {
     await logsHelper.addLogs(
       'error',
@@ -21,7 +60,11 @@ async function getAnlyticalDataFromFile() {
       'getAnlyticalDataFromFile'
     );
   }
-  return _.flatMapDeep(analyticalData);
+  return _.flattenDeep(
+    _.map(_.flatMapDeep(analyticalData), (data) => {
+      return { ...data, pe: `${period}` };
+    })
+  );
 }
 
 async function getAnlyticalDataFromServer(
