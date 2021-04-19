@@ -29,12 +29,6 @@ async function startApp(isSourceFile, manualPeriod) {
       destinationConfig.username,
       destinationConfig.password
     );
-    console.log({
-      manualPeriod,
-      ouColumFromFile,
-      dxColumnFromFile,
-      valueColumnFromFile,
-    });
     const sourceResponseData = isSourceFile
       ? await dataExtractor.getAnlyticalDataFromFile(
           manualPeriod,
@@ -53,6 +47,12 @@ async function startApp(isSourceFile, manualPeriod) {
       sourceResponseData,
       metadataConfigs
     );
+    const httpResponse = await dataUploader.uploadingProcessedAnalyticalData(
+      destinationHeaders,
+      destinationUrl,
+      processedAnalyticalData
+    );
+    await dataUploader.savingDataUploadHttpResponse(httpResponse);
   } catch (error) {
     await logsHelper.addLogs('error', error.message || error, 'startApp');
   }
