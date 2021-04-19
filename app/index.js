@@ -13,7 +13,7 @@ const dataExtractor = require('./data-extractor');
 const dataProcessor = require('./data-extractor');
 const dataUploader = require('./data-uploader');
 
-async function startApp() {
+async function startApp(isSourceFile = true) {
   try {
     await logsHelper.addLogs('info', `Start the process`, 'startApp');
     const sourceUrl = sourceConfig.url;
@@ -26,13 +26,15 @@ async function startApp() {
       destinationConfig.username,
       destinationConfig.password
     );
-    const sourceResponseData = await dataExtractor.getAnlyticalDataFromServer(
-      sourceHeaders,
-      sourceUrl,
-      analyticalPeriods,
-      analyticalOuLevels,
-      metadataConfig
-    );
+    const sourceResponseData = isSourceFile
+      ? await dataExtractor.getAnlyticalDataFromFile()
+      : await dataExtractor.getAnlyticalDataFromServer(
+          sourceHeaders,
+          sourceUrl,
+          analyticalPeriods,
+          analyticalOuLevels,
+          metadataConfig
+        );
     console.log(sourceResponseData);
   } catch (error) {
     await logsHelper.addLogs('error', error.message || error, 'startApp');

@@ -2,6 +2,27 @@ const _ = require('lodash');
 
 const logsHelper = require('../helpers/logs.helper');
 const httpHelper = require('../helpers/http.helper');
+const fileManipulationHelper = require('../helpers/file-manipulation.helper');
+
+async function getAnlyticalDataFromFile() {
+  console.log('get data');
+  const analyticalData = [];
+  const fileDir = 'inputs';
+
+  try {
+    const filesNames = fileManipulationHelper.getFileNamesFromDirectories(
+      fileDir
+    );
+    console.log({ filesNames });
+  } catch (error) {
+    await logsHelper.addLogs(
+      'error',
+      error.message || error,
+      'getAnlyticalDataFromFile'
+    );
+  }
+  return _.flatMapDeep(analyticalData);
+}
 
 async function getAnlyticalDataFromServer(
   headers,
@@ -94,4 +115,5 @@ function getAnlyticalUrl(
 
 module.exports = {
   getAnlyticalDataFromServer,
+  getAnlyticalDataFromFile,
 };
