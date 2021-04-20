@@ -20,11 +20,11 @@ async function getAnlyticalDataFromFile(
       'Discovering analytical data from the files',
       'getAnlyticalDataFromFile'
     );
-    const filesNames = fileManipulationHelper.getFileNamesFromDirectories(
+    const fileNames = fileManipulationHelper.getFileNamesFromDirectories(
       fileDir
     );
-    for (const filesName of filesNames) {
-      const filePath = `${fileManipulationHelper.fileDir}/${fileDir}/${filesName}`;
+    for (const fileName of fileNames) {
+      const filePath = `${fileManipulationHelper.fileDir}/${fileDir}/${fileName}`;
       const excelJsonData = await exceleFileUtilHelper.getJsonDataFromExcelOrCsvFile(
         filePath
       );

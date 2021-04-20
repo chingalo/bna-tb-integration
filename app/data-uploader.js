@@ -2,9 +2,8 @@ const _ = require('lodash');
 
 const logsHelper = require('../helpers/logs.helper');
 const httpHelper = require('../helpers/http.helper');
-const fileManipulationHelper = require('../helpers/file-manipulation.helper');
 
-const batchSize = 100;
+const batchSize = 50;
 
 async function uploadingProcessedAnalyticalData(
   headers,
@@ -39,30 +38,9 @@ async function uploadingProcessedAnalyticalData(
   return httpResponse;
 }
 
-async function savingDataUploadHttpResponse(httpResponse) {
-  try {
-    await logsHelper.addLogs(
-      'info',
-      'Saving http response into file',
-      'savingDataUploadHttpResponse'
-    );
-    await fileManipulationHelper.writeToFile(
-      'outputs',
-      'httpResponse',
-      httpResponse
-    );
-  } catch (error) {
-    await logsHelper.addLogs(
-      'error',
-      error.message || error,
-      'savingDataUploadHttpResponse'
-    );
-  }
-}
-
 function getDataValueSetObjects(processedAnalyticalData) {
   return _.flattenDeep(
-    _.map(processedAnalyticalData, (data) => {
+    _.map(_.chunk(processedAnalyticalData, batchSize * 2)[0], (data) => {
       const { dx: dataElement, pe: period, ou: orgUnit, value } = data;
       return { dataElement, period, orgUnit, value };
     })
@@ -71,5 +49,4 @@ function getDataValueSetObjects(processedAnalyticalData) {
 
 module.exports = {
   uploadingProcessedAnalyticalData,
-  savingDataUploadHttpResponse,
 };
