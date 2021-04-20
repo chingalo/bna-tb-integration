@@ -15,6 +15,7 @@ const dhis2UtilHelper = require('../helpers/dhis2-util.helper');
 const dataExtractor = require('./data-extractor');
 const dataProcessor = require('./data-processor');
 const dataUploader = require('./data-uploader');
+const dataSummaryGenerator = require('./data-summary-generator');
 
 async function startApp(isSourceFile, manualPeriod) {
   try {
@@ -52,7 +53,10 @@ async function startApp(isSourceFile, manualPeriod) {
       destinationUrl,
       processedAnalyticalData
     );
-    await dataUploader.savingDataUploadHttpResponse(httpResponse);
+    await dataSummaryGenerator.generateSummaryReportForDataUpload(
+      httpResponse,
+      ouColumFromFile
+    );
   } catch (error) {
     await logsHelper.addLogs('error', error.message || error, 'startApp');
   }
