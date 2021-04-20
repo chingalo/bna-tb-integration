@@ -3,7 +3,7 @@ const _ = require('lodash');
 const logsHelper = require('../helpers/logs.helper');
 const httpHelper = require('../helpers/http.helper');
 
-const batchSize = 50;
+const batchSize = 500;
 
 async function uploadingProcessedAnalyticalData(
   headers,
@@ -39,7 +39,7 @@ async function uploadingProcessedAnalyticalData(
 
 function getDataValueSetObjects(processedAnalyticalData) {
   return _.flattenDeep(
-    _.map(_.chunk(processedAnalyticalData, batchSize * 2)[0], (data) => {
+    _.map(processedAnalyticalData, (data) => {
       const { dx: dataElement, pe: period, ou: orgUnit, value } = data;
       return { dataElement, period, orgUnit, value };
     })

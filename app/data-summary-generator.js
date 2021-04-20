@@ -25,7 +25,6 @@ async function generateSummaryReportForDataUpload(
 }
 
 async function generateSummaryOfDataImport(httpResponse) {
-  const fileName = 'summary.xls';
   let imported = 0;
   let ignored = 0;
   let deleted = 0;
@@ -39,9 +38,7 @@ async function generateSummaryOfDataImport(httpResponse) {
       deleted += importCount.deleted || 0;
       ignored += importCount.ignored || 0;
     }
-    const filePath = `${fileManipulationHelper.fileDir}/${outputsFileDir}/${fileName}`;
-    console.log({ imported, ignored, deleted, filePath });
-    //await exceleFileUtilHelper.writeToSingleSheetExcelFile({imported,ignored, deleted},filePath );
+    console.log({ imported, ignored, deleted });
   } catch (error) {
     await logsHelper.addLogs(
       'error',
@@ -51,7 +48,10 @@ async function generateSummaryOfDataImport(httpResponse) {
   }
 }
 
-async function generateDetailedReportForDataImport(httpResponse) {
+async function generateDetailedReportForDataImport(
+  httpResponse,
+  ouColumFromFile
+) {
   try {
     const conflictOuIds = _.flattenDeep(
       _.map(
@@ -61,25 +61,33 @@ async function generateDetailedReportForDataImport(httpResponse) {
         (conflict) => conflict.object || []
       )
     );
-    const newExcelJsonData = {};
     const fileNames = fileManipulationHelper.getFileNamesFromDirectories(
       inputFileDir
     );
-    console.log(conflictOuIds);
     for (const fileName of fileNames) {
-      const filePath = `${fileManipulationHelper.fileDir}/${inputFileDir}/${fileName}`;
+      const newExcelJsonData = {};
+      const inputfilePath = `${fileManipulationHelper.fileDir}/${inputFileDir}/${fileName}`;
+      const ouputfilePath = `${fileManipulationHelper.fileDir}/${outputsFileDir}/[Mismatched OU] ${fileName}`;
       const excelJsonData = await exceleFileUtilHelper.getJsonDataFromExcelOrCsvFile(
-        filePath
+        inputfilePath
       );
-      for (const key of _.key(excelJsonData)) {
-        console.log({ key, fileName });
-        // ouColumFromFile
-        // const data =
-        // newExcelJsonData[key] = _.filter()
+      for (const key of _.keys(excelJsonData)) {
+        const filteredJsonData = _.filter(
+          excelJsonData[key],
+          (data) =>
+            _.keys(data).includes(ouColumFromFile) &&
+            conflictOuIds.includes(data[ouColumFromFile])
+        );
+        if (filteredJsonData.length > 0) {
+          newExcelJsonData[key] = filteredJsonData;
+        }
       }
-    }
-    if (_.key(excelJsonData).length > 0) {
-      //@TODO generate  excel file
+      if (_.keys(newExcelJsonData).length > 0) {
+        await exceleFileUtilHelper.writeToMultipleSheetExcelFile(
+          newExcelJsonData,
+          ouputfilePath
+        );
+      }
     }
   } catch (error) {
     await logsHelper.addLogs(
