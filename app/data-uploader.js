@@ -15,7 +15,6 @@ async function uploadingProcessedAnalyticalData(
     const dataValueSets = getDataValueSetObjects(processedAnalyticalData);
     const chunkedDataSets = _.chunk(dataValueSets, batchSize);
     var count = 0;
-    console.log(chunkedDataSets);
     for (const dataValues of chunkedDataSets) {
       count++;
       console.log(`Uploading batch ${count} of ${chunkedDataSets.length}`);

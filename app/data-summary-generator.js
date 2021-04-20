@@ -7,11 +7,14 @@ const exceleFileUtilHelper = require('../helpers/excel-file-util.helper');
 const outputsFileDir = 'outputs';
 const inputFileDir = 'inputs';
 
-async function generateSummaryReportForDataUpload(httpResponse) {
+async function generateSummaryReportForDataUpload(
+  httpResponse,
+  ouColumFromFile
+) {
   try {
     await savingDataUploadHttpResponse(httpResponse);
     await generateSummaryOfDataImport(httpResponse);
-    await generateDetailedReportForDataImport(httpResponse);
+    await generateDetailedReportForDataImport(httpResponse, ouColumFromFile);
   } catch (error) {
     await logsHelper.addLogs(
       'error',
@@ -22,10 +25,23 @@ async function generateSummaryReportForDataUpload(httpResponse) {
 }
 
 async function generateSummaryOfDataImport(httpResponse) {
+  const fileName = 'summary.xls';
+  let imported = 0;
+  let ignored = 0;
+  let deleted = 0;
   try {
-    console.log(JSON.stringify(httpResponse));
-
-    console.log(httpResponse);
+    const importCounts = _.flattenDeep(
+      _.map(httpResponse || [], (data) => data.importCount || [])
+    );
+    for (const importCount of importCounts) {
+      imported += importCount.imported || 0;
+      imported += importCount.updated || 0;
+      deleted += importCount.deleted || 0;
+      ignored += importCount.ignored || 0;
+    }
+    const filePath = `${fileManipulationHelper.fileDir}/${outputsFileDir}/${fileName}`;
+    console.log({ imported, ignored, deleted, filePath });
+    //await exceleFileUtilHelper.writeToSingleSheetExcelFile({imported,ignored, deleted},filePath );
   } catch (error) {
     await logsHelper.addLogs(
       'error',
@@ -37,10 +53,19 @@ async function generateSummaryOfDataImport(httpResponse) {
 
 async function generateDetailedReportForDataImport(httpResponse) {
   try {
+    const conflictOuIds = _.flattenDeep(
+      _.map(
+        _.flattenDeep(
+          _.map(httpResponse || [], (data) => data.conflicts || [])
+        ),
+        (conflict) => conflict.object || []
+      )
+    );
     const newExcelJsonData = {};
     const fileNames = fileManipulationHelper.getFileNamesFromDirectories(
       inputFileDir
     );
+    console.log(conflictOuIds);
     for (const fileName of fileNames) {
       const filePath = `${fileManipulationHelper.fileDir}/${inputFileDir}/${fileName}`;
       const excelJsonData = await exceleFileUtilHelper.getJsonDataFromExcelOrCsvFile(
@@ -48,6 +73,7 @@ async function generateDetailedReportForDataImport(httpResponse) {
       );
       for (const key of _.key(excelJsonData)) {
         console.log({ key, fileName });
+        // ouColumFromFile
         // const data =
         // newExcelJsonData[key] = _.filter()
       }
