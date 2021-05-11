@@ -9,6 +9,7 @@ const {
   dxColumnFromFile,
   valueColumnFromFile,
 } = require('./meta-data-config');
+const { misMatchedOrganisationUnits } = require('./organisation-unit-config');
 
 module.exports = {
   sourceConfig: sourceServer,
@@ -21,4 +22,5 @@ module.exports = {
   ouColumFromFile,
   dxColumnFromFile,
   valueColumnFromFile,
+  misMatchedOrganisationUnits,
 };
