@@ -8,11 +8,15 @@ const batchSize = 500;
 async function uploadingProcessedAnalyticalData(
   headers,
   serverUrl,
-  processedAnalyticalData
+  processedAnalyticalData,
+  misMatchedOrganisationUnits
 ) {
   const httpResponse = [];
   try {
-    const dataValueSets = getDataValueSetObjects(processedAnalyticalData);
+    const dataValueSets = getDataValueSetObjects(
+      processedAnalyticalData,
+      misMatchedOrganisationUnits
+    );
     const chunkedDataSets = _.chunk(dataValueSets, batchSize);
     var count = 0;
     for (const dataValues of chunkedDataSets) {
@@ -37,11 +41,28 @@ async function uploadingProcessedAnalyticalData(
   return httpResponse;
 }
 
-function getDataValueSetObjects(processedAnalyticalData) {
+function getDataValueSetObjects(
+  processedAnalyticalData,
+  misMatchedOrganisationUnits
+) {
   return _.flattenDeep(
     _.map(processedAnalyticalData, (data) => {
       const { dx: dataElement, pe: period, ou: orgUnit, value } = data;
-      return { dataElement, period, orgUnit, value };
+      const filteredOrganisationUnit = _.find(
+        misMatchedOrganisationUnits || [],
+        (organisationUnit) =>
+          organisationUnit.ouId &&
+          organisationUnit.dhis2id &&
+          organisationUnit.ouId === orgUnit
+      );
+      return {
+        dataElement,
+        period,
+        orgUnit: filteredOrganisationUnit
+          ? filteredOrganisationUnit.dhis2id
+          : orgUnit,
+        value,
+      };
     })
   );
 }
