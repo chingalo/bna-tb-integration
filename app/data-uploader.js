@@ -48,8 +48,21 @@ function getDataValueSetObjects(
   return _.flattenDeep(
     _.map(processedAnalyticalData, (data) => {
       const { dx: dataElement, pe: period, ou: orgUnit, value } = data;
-      // @TODO apply mapping
-      return { dataElement, period, orgUnit, value };
+      const filteredOrganisationUnit = _.find(
+        misMatchedOrganisationUnits || [],
+        (organisationUnit) =>
+          organisationUnit.ouId &&
+          organisationUnit.dhis2id &&
+          organisationUnit.ouId === orgUnit
+      );
+      return {
+        dataElement,
+        period,
+        orgUnit: filteredOrganisationUnit
+          ? filteredOrganisationUnit.dhis2id
+          : orgUnit,
+        value,
+      };
     })
   );
 }
