@@ -7,6 +7,7 @@ const {
   ouColumFromFile,
   dxColumnFromFile,
   valueColumnFromFile,
+  misMatchedOrganisationUnits,
 } = require('../configs');
 
 const logsHelper = require('../helpers/logs.helper');
@@ -51,7 +52,8 @@ async function startApp(isSourceFile, manualPeriod) {
     const httpResponse = await dataUploader.uploadingProcessedAnalyticalData(
       destinationHeaders,
       destinationUrl,
-      processedAnalyticalData
+      processedAnalyticalData,
+      misMatchedOrganisationUnits
     );
     await dataSummaryGenerator.generateSummaryReportForDataUpload(
       httpResponse,
